@@ -2,44 +2,40 @@
 
 public class PlayerMovement : MonoBehaviour
 {
-	public float speed;       
-	public float gravity;      
-	public float impulse;      
-	public float groundY;     
+    public float moveSpeed = 5f;
+    public float jumpForce = 7f;
+    public float gravity = 9.8f;
+    public float groundY = -4.5f;
 
-	private bool isGrounded = true;
+    private bool isGrounded = true;
+    private float verticalVelocity = 0f;
 
-	void Start()
-	{
-		speed = 5.0f;
-		gravity = 9.8f;
-		impulse = 7.0f;
-		groundY = -4.5f;
-	}
+    void Update()
+    {
+        
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        transform.position += new Vector3(moveHorizontal * moveSpeed * Time.deltaTime, 0, 0);
 
-	void Update()
-	{
-		float moveHorizontal = Input.GetAxis("Horizontal");
-		transform.position += new Vector3(moveHorizontal * Time.deltaTime * 5f, 0, 0);
-		if (isGrounded && Input.GetKeyDown(KeyCode.Space))
-		{
-			speed = impulse;
-			isGrounded = false;
-		}
+        // Salto
+        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
+        {
+            verticalVelocity = jumpForce;
+            isGrounded = false;
+        }
 
+        
+        if (!isGrounded)
+        {
+            verticalVelocity -= gravity * Time.deltaTime;
+            transform.position += Vector3.up * verticalVelocity * Time.deltaTime;
 
-		if (!isGrounded)
-		{
-			speed -= gravity * Time.deltaTime;
-			transform.position += Vector3.up * speed * Time.deltaTime;
-
-		}	
-			if (transform.position.y <= groundY)
-			{
-				transform.position = new Vector3(transform.position.x, groundY, transform.position.z);
-				isGrounded = true;
-				speed = 0f; new Vector2(transform.position.x, transform.position.y);
-		}
-
-	}
+            
+            if (transform.position.y <= groundY)
+            {
+                transform.position = new Vector3(transform.position.x, groundY, transform.position.z);
+                isGrounded = true;
+                verticalVelocity = 0f;
+            }
+        }
+    }
 }
